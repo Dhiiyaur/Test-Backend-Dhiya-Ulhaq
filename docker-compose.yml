@@ -1,20 +1,26 @@
+
+
 version: '3.8'
 services:
   backend:
-    build: ./backend
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    build: ./BE
     volumes:
-      - ./backend:/app/backend
+      - ./BE:/app/backend
     ports:
       - "8000:8000"
+    stdin_open: true
+    tty: true
+    command: python3 manage.py runserver 0.0.0.0:8000
   frontend:
-    build: ./frontend
-    command: ["npm", "start"]
+    build: ./FE
     volumes:
-      - ./frontend:/app/frontend
-      - node-modules:/app/frontend/node_modules
+      - ./FE:/app
+      # One-way volume to use node_modules from inside image
+      - /app/node_modules
     ports:
       - "3000:3000"
-
-volumes:
-  node-modules:
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    command: npm start
